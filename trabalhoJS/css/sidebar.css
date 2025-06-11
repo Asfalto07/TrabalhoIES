@@ -1,0 +1,39 @@
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #343a40;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    transition: 0.2s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: white;
+    background-color: #495057;
+    border-radius: 5px;
+}
+
+.sidebar .logo {
+    text-align: center;
+}
+
+.sidebar .logo img {
+    max-width: 60%;
+    margin-bottom: 0.5rem;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 2rem;
+}
