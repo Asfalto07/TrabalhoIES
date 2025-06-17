@@ -8,4 +8,4 @@ function isLoggedIn() {
     if (localStorage.getItem('loggedIn') !== 'true') {
         window.location.href = 'login.html';
     }
-}
+}s

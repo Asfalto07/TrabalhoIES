@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gerenciamento de Contas - AdSmart</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/sidebar.css" />
+  </head>
+  <body>
+    <div class="sidebar">
+      <div>
+        <div class="logo">
+          <img src="/images/logo.png" alt="Logo" />
+          <h5>AdSmart</h5>
+        </div>
+        <hr class="border-secondary" />
+        <ul class="nav flex-column gap-2">
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html">🏠 Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="usuarios.html">👤 Usuários</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="gerenciamento-contas.html">🔗 Contas</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="relatorios.html">📊 Relatórios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="configuracoes.html">⚙️ Configurações</a>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <hr class="border-secondary" />
+        <button onclick="logout()" class="btn btn-danger w-100">Logout</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2>Gerenciamento de Contas</h2>
+          <p class="text-muted">Conecte e gerencie suas contas de redes sociais</p>
+        </div>
+      </div>
+
+      <!-- Cards de Estatísticas -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5 class="card-title">Contas Conectadas</h5>
+                  <h2 class="mb-0" id="connected-count">0</h2>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-link fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5 class="card-title">Total de Seguidores</h5>
+                  <h2 class="mb-0" id="total-followers">0</h2>
+                </div>
+                <div class="align-self-center">
+                  <i class="fas fa-users fa-2x"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards das Plataformas -->
+      <div class="row">
+        <!-- Instagram -->
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100" data-platform="instagram">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-3 me-3" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);">
+                  <i class="fab fa-instagram text-white fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="card-title mb-1">Instagram</h5>
+                  <small class="text-muted status" id="instagram-status">Não conectado</small>
+                </div>
+              </div>
+              <div class="account-details d-none">
+                <p class="mb-1"><strong>Usuário:</strong> <span class="username"></span></p>
+                <p class="mb-3"><strong>Seguidores:</strong> <span class="followers"></span></p>
+              </div>
+              <button class="btn btn-outline-primary w-100 connect-btn" onclick="toggleConnection('instagram')">
+                <i class="fas fa-link"></i> Conectar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TikTok -->
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100" data-platform="tiktok">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-3 me-3 bg-dark">
+                  <i class="fab fa-tiktok text-white fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="card-title mb-1">TikTok</h5>
+                  <small class="text-muted status" id="tiktok-status">Não conectado</small>
+                </div>
+              </div>
+              <div class="account-details d-none">
+                <p class="mb-1"><strong>Usuário:</strong> <span class="username"></span></p>
+                <p class="mb-3"><strong>Seguidores:</strong> <span class="followers"></span></p>
+              </div>
+              <button class="btn btn-outline-primary w-100 connect-btn" onclick="toggleConnection('tiktok')">
+                <i class="fas fa-link"></i> Conectar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- YouTube -->
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100" data-platform="youtube">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-3 me-3" style="background: #FF0000;">
+                  <i class="fab fa-youtube text-white fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="card-title mb-1">YouTube</h5>
+                  <small class="text-muted status" id="youtube-status">Não conectado</small>
+                </div>
+              </div>
+              <div class="account-details d-none">
+                <p class="mb-1"><strong>Canal:</strong> <span class="username"></span></p>
+                <p class="mb-3"><strong>Inscritos:</strong> <span class="followers"></span></p>
+              </div>
+              <button class="btn btn-outline-primary w-100 connect-btn" onclick="toggleConnection('youtube')">
+                <i class="fas fa-link"></i> Conectar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Twitter/X -->
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100" data-platform="twitter">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-3 me-3" style="background: #1DA1F2;">
+                  <i class="fab fa-twitter text-white fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="card-title mb-1">Twitter/X</h5>
+                  <small class="text-muted status" id="twitter-status">Não conectado</small>
+                </div>
+              </div>
+              <div class="account-details d-none">
+                <p class="mb-1"><strong>Usuário:</strong> <span class="username"></span></p>
+                <p class="mb-3"><strong>Seguidores:</strong> <span class="followers"></span></p>
+              </div>
+              <button class="btn btn-outline-primary w-100 connect-btn" onclick="toggleConnection('twitter')">
+                <i class="fas fa-link"></i> Conectar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facebook -->
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100" data-platform="facebook">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-3 me-3" style="background: #4267B2;">
+                  <i class="fab fa-facebook-f text-white fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="card-title mb-1">Facebook</h5>
+                  <small class="text-muted status" id="facebook-status">Não conectado</small>
+                </div>
+              </div>
+              <div class="account-details d-none">
+                <p class="mb-1"><strong>Usuário:</strong> <span class="username"></span></p>
+                <p class="mb-3"><strong>Amigos:</strong> <span class="followers"></span></p>
+              </div>
+              <button class="btn btn-outline-primary w-100 connect-btn" onclick="toggleConnection('facebook')">
+                <i class="fas fa-link"></i> Conectar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedIn -->
+        <div class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100" data-platform="linkedin">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle p-3 me-3" style="background: #0077B5;">
+                  <i class="fab fa-linkedin-in text-white fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="card-title mb-1">LinkedIn</h5>
+                  <small class="text-muted status" id="linkedin-status">Não conectado</small>
+                </div>
+              </div>
+              <div class="account-details d-none">
+                <p class="mb-1"><strong>Usuário:</strong> <span class="username"></span></p>
+                <p class="mb-3"><strong>Conexões:</strong> <span class="followers"></span></p>
+              </div>
+              <button class="btn btn-outline-primary w-100 connect-btn" onclick="toggleConnection('linkedin')">
+                <i class="fas fa-link"></i> Conectar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Conectar Conta -->
+    <div class="modal fade" id="connectionModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Conectar Conta</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="connectionForm">
+              <div class="mb-3">
+                <label for="username" class="form-label">Nome de usuário</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  placeholder="Digite seu nome de usuário"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Digite sua senha"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="connectAccount()"
+            >
+              Conectar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/gerenciamento-contas.js"></script>
+    <script>
+      isLoggedIn();
+    </script>
+  </body>
+</html>
