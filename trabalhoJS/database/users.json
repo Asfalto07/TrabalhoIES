@@ -10,5 +10,31 @@
       "username": "a",
       "password": "a"
     }
+  ],
+  "contas": [
+    {
+      "id": "1546",
+      "platform": "instagram",
+      "username": "mauricoo",
+      "followers": 1358,
+      "connected": true,
+      "connectedAt": "2025-06-17T23:44:53.764Z"
+    },
+    {
+      "id": "9797",
+      "platform": "tiktok",
+      "username": "dwdwdw",
+      "followers": 1707,
+      "connected": true,
+      "connectedAt": "2025-06-17T23:44:59.965Z"
+    },
+    {
+      "id": "d4ea",
+      "platform": "youtube",
+      "username": "dwwwd",
+      "followers": 9223,
+      "connected": true,
+      "connectedAt": "2025-06-17T23:45:06.708Z"
+    }
   ]
 }
