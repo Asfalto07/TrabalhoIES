@@ -1,40 +1,159 @@
 {
   "users": [
     {
+      "id": "d266",
       "username": "admin",
       "password": "admin",
-      "id": "d266"
+      "createdAt": "2025-06-15T10:30:00.000Z",
+      "contas": [
+        {
+          "id": "42dd",
+          "platform": "instagram",
+          "username": "msrossetti_",
+          "followers": [
+            {
+              "data": "2025-06-15T00:00:00.000Z",
+              "numero": 4400
+            },
+            {
+              "data": "2025-06-16T00:00:00.000Z",
+              "numero": 4420
+            },
+            {
+              "data": "2025-06-17T00:00:00.000Z",
+              "numero": 4458
+            }
+          ],
+          "totalFollowers": 4458,
+          "connected": true,
+          "connectedAt": "2025-06-17T23:57:48.664Z"
+        },
+        {
+          "id": "ri5s",
+          "platform": "tiktok",
+          "username": "a",
+          "followers": [
+            {
+              "data": "2025-06-18T00:56:06.536Z",
+              "numero": 1284
+            }
+          ],
+          "totalFollowers": 1284,
+          "connected": true,
+          "connectedAt": "2025-06-18T00:56:06.536Z"
+        },
+        {
+          "id": "m9s9",
+          "platform": "youtube",
+          "username": "a",
+          "followers": [
+            {
+              "data": "2025-06-18T00:56:33.055Z",
+              "numero": 8604
+            }
+          ],
+          "totalFollowers": 8604,
+          "connected": true,
+          "connectedAt": "2025-06-18T00:56:33.055Z"
+        },
+        {
+          "id": "d5hz",
+          "platform": "twitter",
+          "username": "a",
+          "followers": [
+            {
+              "data": "2025-06-18T00:56:57.462Z",
+              "numero": 225
+            }
+          ],
+          "totalFollowers": 225,
+          "connected": true,
+          "connectedAt": "2025-06-18T00:56:57.462Z"
+        },
+        {
+          "id": "9s8f",
+          "platform": "facebook",
+          "username": "a",
+          "followers": [
+            {
+              "data": "2025-06-18T00:57:00.567Z",
+              "numero": 373
+            }
+          ],
+          "totalFollowers": 373,
+          "connected": true,
+          "connectedAt": "2025-06-18T00:57:00.567Z"
+        },
+        {
+          "id": "f4g9",
+          "platform": "linkedin",
+          "username": "a",
+          "followers": [
+            {
+              "data": "2025-06-18T00:57:33.654Z",
+              "numero": 139
+            }
+          ],
+          "totalFollowers": 139,
+          "connected": true,
+          "connectedAt": "2025-06-18T00:57:33.654Z"
+        }
+      ]
     },
     {
       "id": "5f98",
       "username": "a",
-      "password": "a"
-    }
-  ],
-  "contas": [
-    {
-      "id": "1546",
-      "platform": "instagram",
-      "username": "mauricoo",
-      "followers": 1358,
-      "connected": true,
-      "connectedAt": "2025-06-17T23:44:53.764Z"
+      "password": "a",
+      "createdAt": "2025-06-16T14:20:00.000Z",
+      "contas": [
+        {
+          "id": "9beb",
+          "platform": "tiktok",
+          "username": "gabriel",
+          "followers": [
+            {
+              "data": "2025-06-16T00:00:00.000Z",
+              "numero": 1600
+            },
+            {
+              "data": "2025-06-17T00:00:00.000Z",
+              "numero": 1627
+            }
+          ],
+          "totalFollowers": 1627,
+          "connected": true,
+          "connectedAt": "2025-06-17T23:58:09.023Z"
+        }
+      ]
     },
     {
-      "id": "9797",
-      "platform": "tiktok",
-      "username": "dwdwdw",
-      "followers": 1707,
-      "connected": true,
-      "connectedAt": "2025-06-17T23:44:59.965Z"
+      "id": "3ca3",
+      "username": "mauricio",
+      "password": "838383838",
+      "createdAt": "2025-06-17T08:45:00.000Z",
+      "contas": [
+        {
+          "id": "74ce",
+          "platform": "youtube",
+          "username": "aaa",
+          "followers": [
+            {
+              "data": "2025-06-17T00:00:00.000Z",
+              "numero": 6017
+            }
+          ],
+          "totalFollowers": 6017,
+          "connected": true,
+          "connectedAt": "2025-06-18T00:09:37.140Z"
+        }
+      ]
     },
     {
-      "id": "d4ea",
-      "platform": "youtube",
-      "username": "dwwwd",
-      "followers": 9223,
-      "connected": true,
-      "connectedAt": "2025-06-17T23:45:06.708Z"
+      "id": "20bd",
+      "username": "aaaa",
+      "password": "aa",
+      "createdAt": "2025-06-18T00:18:09.460Z",
+      "contas": []
     }
   ]
 }

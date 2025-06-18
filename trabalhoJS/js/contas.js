@@ -1,174 +1,225 @@
 let accounts = {};
 let currentPlatform = '';
-const API_URL = 'http://localhost:3000/contas';
+let currentUser = null;
+const API_URL = 'http://localhost:3000/users';
 
 // Plataformas disponíveis
 const platforms = ['instagram', 'tiktok', 'youtube', 'twitter', 'facebook', 'linkedin'];
 
-// Carregar contas do servidor
-function loadAccounts() {
-    fetch(API_URL)
-        .then(response => response.json())
-        .then(data => {
-            // Inicializar todas as plataformas como desconectadas
-            platforms.forEach(platform => {
-                accounts[platform] = { connected: false, username: '', followers: 0, id: null };
-            });
-            
-            // Atualizar com dados do servidor
-            data.forEach(conta => {
-                if (accounts[conta.platform]) {
-                    accounts[conta.platform] = {
-                        connected: conta.connected,
-                        username: conta.username,
-                        followers: conta.followers,
-                        id: conta.id
-                    };
-                }
-            });
-            
-            updateUI();
-        })
-        .catch(error => {
-            console.error('Erro ao carregar contas:', error);
-            // Fallback para dados locais se o servidor não estiver disponível
-            loadLocalAccounts();
-        });
+// Carregar contas do usuário atual
+async function loadAccounts() {
+    console.log('Carregando contas...');
+    
+    try {
+        // Carregar usuário atual do servidor
+        currentUser = await getCurrentUser();
+        console.log('Usuário atual:', currentUser);
+        
+        // Carregar dados das contas
+        loadUserAccounts();
+        
+    } catch (error) {
+        console.error('Erro ao carregar usuário:', error);
+        showToast('Erro: Não foi possível carregar dados do usuário', 'error');
+    }
 }
 
-// Fallback para dados locais
-function loadLocalAccounts() {
-    const savedAccounts = localStorage.getItem('socialAccounts');
-    if (savedAccounts) {
-        accounts = JSON.parse(savedAccounts);
-    } else {
-        // Inicializar todas as plataformas como desconectadas
-        platforms.forEach(platform => {
-            accounts[platform] = { connected: false, username: '', followers: 0, id: null };
+// Carregar dados das contas do usuário
+function loadUserAccounts() {
+    console.log('Carregando dados das contas...');
+    
+    // Inicializar todas as plataformas como desconectadas
+    platforms.forEach(platform => {
+        accounts[platform] = { connected: false, username: '', followers: 0, id: null };
+    });
+    
+    // Usar dados do usuário atual
+    if (currentUser.contas && currentUser.contas.length > 0) {
+        console.log('Contas encontradas:', currentUser.contas);
+        currentUser.contas.forEach(conta => {
+            if (accounts[conta.platform]) {
+                accounts[conta.platform] = {
+                    connected: conta.connected,
+                    username: conta.username,
+                    followers: conta.totalFollowers || 0,
+                    id: conta.id,
+                    followersHistory: conta.followers || []
+                };
+            }
         });
     }
+    
+    console.log('Accounts carregadas:', accounts);
     updateUI();
 }
 
 // Salvar conta no servidor
-function saveAccount(platform, accountData) {
-    const conta = {
+async function saveAccount(platform, accountData) {
+    if (!currentUser) {
+        showToast('Erro: Nenhum usuário logado', 'error');
+        return;
+    }
+
+    console.log('Salvando conta:', platform, accountData);
+
+    // Garantir que o array de contas existe
+    if (!currentUser.contas) {
+        currentUser.contas = [];
+    }
+
+    // Procurar se já existe uma conta desta plataforma
+    const existingIndex = currentUser.contas.findIndex(conta => conta.platform === platform);
+    
+    const contaData = {
+        id: accountData.id || generateId(),
         platform: platform,
         username: accountData.username,
-        followers: accountData.followers,
-        connected: accountData.connected,
+        followers: [{
+            data: new Date().toISOString(),
+            numero: accountData.followers
+        }],
+        totalFollowers: accountData.followers,
+        connected: true,
         connectedAt: new Date().toISOString()
     };
 
-    if (accountData.id) {
+    if (existingIndex >= 0) {
         // Atualizar conta existente
-        fetch(`${API_URL}/${accountData.id}`, {
+        currentUser.contas[existingIndex] = contaData;
+    } else {
+        // Adicionar nova conta
+        currentUser.contas.push(contaData);
+    }
+
+    try {
+        // Salvar no servidor
+        const response = await fetch(`${API_URL}/${currentUser.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(conta)
-        })
-        .then(response => response.json())
-        .then(() => {
-            loadAccounts();
-        })
-        .catch(error => {
-            console.error('Erro ao atualizar conta:', error);
-            saveLocalAccount(platform, accountData);
+            body: JSON.stringify(currentUser)
         });
-    } else {
-        // Criar nova conta
-        fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(conta)
-        })
-        .then(response => response.json())
-        .then(() => {
-            loadAccounts();
-        })
-        .catch(error => {
-            console.error('Erro ao criar conta:', error);
-            saveLocalAccount(platform, accountData);
-        });
+
+        if (!response.ok) {
+            throw new Error('Erro ao salvar conta');
+        }
+        
+        // Atualizar accounts local
+        accounts[platform] = {
+            connected: true,
+            username: accountData.username,
+            followers: accountData.followers,
+            id: contaData.id
+        };
+        
+        updateUI();
+        
+    } catch (error) {
+        console.error('Erro ao salvar conta:', error);
+        showToast('Erro ao salvar conta', 'error');
     }
 }
 
 // Excluir conta do servidor
-function deleteAccount(platform) {
-    const accountId = accounts[platform].id;
-    
-    if (accountId) {
-        fetch(`${API_URL}/${accountId}`, {
-            method: 'DELETE'
-        })
-        .then(() => {
-            accounts[platform] = { connected: false, username: '', followers: 0, id: null };
-            updateUI();
-        })
-        .catch(error => {
-            console.error('Erro ao excluir conta:', error);
-            // Fallback local
-            accounts[platform] = { connected: false, username: '', followers: 0, id: null };
-            saveLocalAccounts();
-            updateUI();
+async function deleteAccount(platform) {
+    if (!currentUser) {
+        showToast('Erro: Nenhum usuário logado', 'error');
+        return;
+    }
+
+    try {
+        // Remover da lista de contas do usuário
+        if (currentUser.contas) {
+            currentUser.contas = currentUser.contas.filter(conta => conta.platform !== platform);
+        }
+
+        // Salvar no servidor
+        const response = await fetch(`${API_URL}/${currentUser.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(currentUser)
         });
+
+        if (!response.ok) {
+            throw new Error('Erro ao excluir conta');
+        }
+
+        // Atualizar accounts local
+        accounts[platform] = {
+            connected: false,
+            username: '',
+            followers: 0,
+            id: null
+        };
+
+        updateUI();
+        showToast(`Conta ${platform} desconectada!`, 'success');
+        
+    } catch (error) {
+        console.error('Erro ao excluir conta:', error);
+        showToast('Erro ao desconectar conta', 'error');
     }
 }
 
-// Salvar localmente como fallback
-function saveLocalAccount(platform, accountData) {
-    accounts[platform] = accountData;
-    saveLocalAccounts();
-    updateUI();
-}
-
-function saveLocalAccounts() {
-    localStorage.setItem('socialAccounts', JSON.stringify(accounts));
+// Gerar ID único
+function generateId() {
+    return Math.random().toString(36).substr(2, 4);
 }
 
 // Alternar conexão
 function toggleConnection(platform) {
+    console.log('Toggle connection:', platform);
     currentPlatform = platform;
     
     if (accounts[platform].connected) {
         // Desconectar
-        const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
-        if (confirm(`Deseja desconectar sua conta do ${platformName}?`)) {
+        if (confirm(`Deseja desconectar a conta do ${platform}?`)) {
             deleteAccount(platform);
-            showToast(`Conta do ${platformName} desconectada com sucesso!`, 'success');
         }
     } else {
-        // Conectar - abrir modal
+        // Conectar
         openConnectionModal(platform);
     }
 }
 
 // Abrir modal de conexão
 function openConnectionModal(platform) {
+    console.log('Abrindo modal para:', platform);
     const modal = new bootstrap.Modal(document.getElementById('connectionModal'));
     const title = document.getElementById('modalTitle');
     
     const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
     title.textContent = `Conectar ${platformName}`;
     
-    // Limpar formulário
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
+    // Preencher o formulário do modal
+    const modalBody = document.querySelector('#connectionModal .modal-body');
+    modalBody.innerHTML = `
+        <form id="connectionForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuário do ${platformName}</label>
+                <input type="text" class="form-control" id="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Senha</label>
+                <input type="password" class="form-control" id="password" required>
+            </div>
+        </form>
+    `;
     
     modal.show();
 }
 
 // Conectar conta
 function connectAccount() {
+    console.log('Conectando conta...');
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     
     if (!username || !password) {
-        showToast('Por favor, preencha todos os campos!', 'error');
+        showToast('Por favor, preencha todos os campos', 'error');
         return;
     }
     
@@ -209,35 +260,61 @@ function simulateConnection(platform, username) {
 
 // Atualizar interface
 function updateUI() {
+    console.log('Atualizando UI...');
+    
     Object.keys(accounts).forEach(platform => {
         const card = document.querySelector(`[data-platform="${platform}"]`);
-        if (!card) return; // Pular se o card não existir
+        if (!card) return;
+
+        const account = accounts[platform];
+        const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
         
-        const status = card.querySelector('.status');
+        // Ícones das plataformas
+        const icons = {
+            instagram: 'fab fa-instagram',
+            tiktok: 'fab fa-tiktok',
+            youtube: 'fab fa-youtube',
+            twitter: 'fab fa-twitter',
+            facebook: 'fab fa-facebook',
+            linkedin: 'fab fa-linkedin'
+        };
+
+        // Cores das plataformas
+        const colors = {
+            instagram: '#E4405F',
+            tiktok: '#000000',
+            youtube: '#FF0000',
+            twitter: '#1DA1F2',
+            facebook: '#4267B2',
+            linkedin: '#0077B5'
+        };
+
+        // Atualizar cabeçalho do card
+        const headerDiv = card.querySelector('.d-flex.align-items-center.mb-3');
+        headerDiv.innerHTML = `
+            <i class="${icons[platform]}" style="font-size: 2rem; color: ${colors[platform]};"></i>
+            <div class="ms-3">
+                <h5 class="mb-0">${platformName}</h5>
+                <small class="text-muted">${account.connected ? 'Conectado' : 'Desconectado'}</small>
+            </div>
+        `;
+
+        // Atualizar detalhes da conta
+        const detailsDiv = card.querySelector('.account-details');
         const button = card.querySelector('.connect-btn');
-        const details = card.querySelector('.account-details');
-        const username = details.querySelector('.username');
-        const followers = details.querySelector('.followers');
-        
-        if (accounts[platform].connected) {
-            // Conectado
-            card.classList.add('border-success');
-            status.textContent = 'Conectado';
-            status.className = 'text-success status';
-            button.innerHTML = '<i class="fas fa-unlink"></i> Desconectar';
+
+        if (account.connected) {
+            detailsDiv.innerHTML = `
+                <p class="mb-1"><strong>@${account.username}</strong></p>
+                <p class="mb-0 text-muted">${formatFollowers(account.followers)} seguidores</p>
+            `;
+            detailsDiv.classList.remove('d-none');
+            button.textContent = 'Desconectar';
             button.className = 'btn btn-outline-danger w-100 connect-btn';
-            
-            username.textContent = `@${accounts[platform].username}`;
-            followers.textContent = formatFollowers(accounts[platform].followers);
-            details.classList.remove('d-none');
         } else {
-            // Desconectado
-            card.classList.remove('border-success');
-            status.textContent = 'Não conectado';
-            status.className = 'text-muted status';
-            button.innerHTML = '<i class="fas fa-link"></i> Conectar';
+            detailsDiv.classList.add('d-none');
+            button.textContent = 'Conectar';
             button.className = 'btn btn-outline-primary w-100 connect-btn';
-            details.classList.add('d-none');
         }
     });
     
@@ -250,9 +327,8 @@ function formatFollowers(count) {
         return (count / 1000000).toFixed(1) + 'M';
     } else if (count >= 1000) {
         return (count / 1000).toFixed(1) + 'K';
-    } else {
-        return count.toString();
     }
+    return count.toString();
 }
 
 // Atualizar resumo
@@ -266,13 +342,15 @@ function updateSummary() {
 
 // Mostrar toast/notificação
 function showToast(message, type = 'info') {
+    console.log('Toast:', message, type);
+    
     // Criar container de toast se não existir
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
         toastContainer = document.createElement('div');
         toastContainer.id = 'toast-container';
-        toastContainer.className = 'position-fixed top-0 end-0 p-3';
-        toastContainer.style.zIndex = '1080';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
         document.body.appendChild(toastContainer);
     }
     
@@ -303,11 +381,15 @@ function showToast(message, type = 'info') {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM carregado, inicializando contas...');
     loadAccounts();
     
     // Event listener para o formulário
-    document.getElementById('connectionForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        connectAccount();
-    });
+    const connectionForm = document.getElementById('connectionForm');
+    if (connectionForm) {
+        connectionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            connectAccount();
+        });
+    }
 });

@@ -1,9 +1,11 @@
 let users = [];
+const API_URL = 'http://localhost:3000/users';
 
-fetch('../database/users.json')
+// Carregar usuários do JSON Server
+fetch(API_URL)
   .then(response => response.json())
   .then(data => {
-    users = data.users;
+    users = data;
   })
   .catch(error => console.error('Erro ao carregar usuários:', error));
 
@@ -17,6 +19,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
 
   if (user) {
     localStorage.setItem('loggedIn', 'true');
+    localStorage.setItem('userId', user.id); // Salvar apenas o ID do usuário
     window.location.href = 'dashboard.html';
   } else {
     document.getElementById('alert').classList.remove('d-none');

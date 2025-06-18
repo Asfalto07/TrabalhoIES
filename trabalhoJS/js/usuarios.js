@@ -20,8 +20,13 @@ function displayUsers() {
     
     users.forEach((user, index) => {
         const row = document.createElement('tr');
+        const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A';
+        const contasCount = user.contas ? user.contas.length : 0;
+        
         row.innerHTML = `
             <td>${user.username}</td>
+            <td>${createdDate}</td>
+            <td>${contasCount} conta(s)</td>
             <td>
                 <button class="btn btn-sm btn-warning" onclick="editUser(${index})">Editar</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteUser(${index})">Excluir</button>
@@ -37,7 +42,18 @@ function saveUser() {
     const password = document.getElementById('password').value;
     const editingId = document.getElementById('editingId').value;
 
-    const userData = { username, password };
+    const userData = { 
+        username, 
+        password,
+        createdAt: editingId === '' ? new Date().toISOString() : undefined,
+        contas: editingId === '' ? [] : undefined
+    };
+
+    // Remove campos se estiver editando (manter dados originais)
+    if (editingId !== '') {
+        delete userData.createdAt;
+        delete userData.contas;
+    }
 
     if (editingId === '') {
         // Novo usuário
