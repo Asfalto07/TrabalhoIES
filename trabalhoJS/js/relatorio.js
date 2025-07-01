@@ -337,7 +337,12 @@ function formatFollowers(count) {
     }
     return count.toLocaleString('pt-BR');
 }
-
+function downloadChart(chart, filename) {
+    const link = document.createElement('a');
+    link.href = chart.toBase64Image();
+    link.download = filename;
+    link.click();
+}
 // Função para mostrar mensagem quando não há dados
 function showNoDataMessage() {
     console.log('Mostrando mensagem de sem dados');

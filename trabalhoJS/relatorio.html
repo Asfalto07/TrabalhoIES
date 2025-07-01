@@ -64,6 +64,11 @@
                 <h5 class="mb-0">👤 Data de Cadastro do Usuário</h5>
               </div>
               <div class="card-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button onclick="downloadChart(usersChart, 'cadastro_usuario.png')" class="btn btn-sm btn-outline-secondary">
+                    ⬇️ Baixar Imagem
+                  </button>
+                </div>
                 <div style="position: relative; height: 300px;">
                   <canvas id="usersChart"></canvas>
                 </div>
@@ -79,6 +84,11 @@
                 <h5 class="mb-0">📈 Evolução de Seguidores</h5>
               </div>
               <div class="card-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button onclick="downloadChart(followersChart, 'evolucao_seguidores.png')" class="btn btn-sm btn-outline-secondary">
+                    ⬇️ Baixar Imagem
+                  </button>
+                </div>
                 <div style="position: relative; height: 400px;">
                   <canvas id="followersChart"></canvas>
                 </div>
@@ -95,6 +105,13 @@
     <script src="js/relatorio.js"></script>
     <script>
       isLoggedIn();
+
+      function downloadChart(chart, filename) {
+        const link = document.createElement('a');
+        link.href = chart.toBase64Image();
+        link.download = filename;
+        link.click();
+      }
     </script>
   </body>
 </html>
